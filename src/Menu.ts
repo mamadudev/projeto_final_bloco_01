@@ -1,124 +1,124 @@
+// src/Menu.ts
 import readlinesync from 'readline-sync';
-//import { Cores } from './utils/Cores';             cores
+import { ProdutoController } from "./controller/ProdutoController";
 import { Camiseta } from "./model/Camiseta";
-import { produtoController } from "./controller/ProdutoController";
 
-const CoresLocal = {
-    reset: "\x1b[0m",
-    fundo: "\x1b[40m",
-    verde: "\x1b[32m",
-    amarelo: "\x1b[33m"
+const controller = new ProdutoController();
+
+const Cores = {
+  reset: "\x1b[0m",
+  fundo: "\x1b[40m",
+  verde: "\x1b[32m",
+  amarelo: "\x1b[33m"
 };
 
-function cadastrarProduto() {
-    try {
-        const id = readlinesync.questionInt("ID do produto: ");
-        const nome = readlinesync.question("Nome: ");
-        const preco = Number(readlinesync.question("Preco: "));
-        const tamanho = readlinesync.question("Tamanho: ");
-        const p = new Camiseta(id, nome, preco, tamanho);
-        produtoController.cadastrar(p);
-        console.log("\nProduto cadastrado com sucesso!");
-    } catch (err: any) {
-        console.log("Erro ao cadastrar:", err.message);
-    }
-}
-
-function listarProdutos() {
-    const lista = produtoController.listarTodos();
-    if (lista.length === 0) {
-        console.log("\nNenhum produto cadastrado.");
-        return;
-    }
-    lista.forEach(p => p.visualizar());
-}
-
-function buscarPorId() {
-    const id = readlinesync.questionInt("Digite o ID para busca: ");
-    const p = produtoController.procurarPorId(id);
-    if (!p) {
-        console.log("\nProduto nao encontrado.");
-    } else {
-        p.visualizar();
-    }
-}
-
-function atualizarProduto() {
-    try {
-        const id = readlinesync.questionInt("ID do produto a atualizar: ");
-        const existente = produtoController.procurarPorId(id);
-        if (!existente) {
-            console.log("\nProduto não encontrado.");
-            return;
-        }
-        const novoNome = readlinesync.question(`Novo nome (${existente.getNome()}): `) || existente.getNome();
-        const novoPrecoStr = readlinesync.question(`Novo preco (${existente.getPreco()}): `);
-        const novoPreco = novoPrecoStr ? Number(novoPrecoStr) : existente.getPreco();
-
-        // se for Camiseta, pedir tamanho também
-        if (existente instanceof Camiseta) {
-            const camiseta = existente as Camiseta;
-            const novoTam = readlinesync.question(`Novo tamanho (${camiseta.tamanho}): `) || camiseta.tamanho;
-            const atualizado = new Camiseta(id, novoNome, novoPreco, novoTam);
-            produtoController.atualizar(atualizado);
-        } else {
-            // caso tenha outras subclasses futuramente
-            existente.setNome(novoNome);
-            existente.setPreco(novoPreco);
-            produtoController.atualizar(existente);
-        }
-
-        console.log("\nProduto atualizado com sucesso.");
-    } catch (err: any) {
-        console.log("Erro ao atualizar:", err.message);
-    }
-}
-
-function deletarProduto() {
-    try {
-        const id = readlinesync.questionInt("ID do produto a deletar: ");
-        produtoController.deletar(id);
-        console.log("\nProduto deletado com sucesso.");
-    } catch (err: any) {
-        console.log("Erro ao deletar:", err.message);
-    }
-}
-
 export function main() {
-    let opcao = -1;
-    do {
-        console.log(CoresLocal.fundo + CoresLocal.amarelo);
-        console.log("*****************************************************");
-        console.log("         loja online DE ROUPAS (GENERATION)       ");
-        console.log("*****************************************************");
-        console.log("\n1 - Cadastrar Produto");
-        console.log("2 - Listar Todos os Produtos");
-        console.log("3 - Buscar Produto por ID");
-        console.log("4 - Atualizar Produto");
-        console.log("5 - Deletar Produto");
-        console.log(CoresLocal.verde + "0 - Sair");
-        console.log(CoresLocal.amarelo + "*****************************************************" + CoresLocal.reset);
+  let opcao: number = -1;
+  let Id = 1;
 
+  do {
+    console.log(Cores.fundo + Cores.amarelo);
+    console.log("*****************************************************");
+    console.log("                Loja de Roupas (GENERATION)          ");
+    console.log("*****************************************************");
+    console.log("\n1 - Cadastrar roupa");
+    console.log("2 - Listar Todas as roupa");
+    console.log("3 - Buscar roupa por ID");
+    console.log("4 - Atualizar roupa");
+    console.log("5 - Deletar roupa");
+    console.log(Cores.verde + "0 - Sair");
+    console.log(Cores.amarelo + "*****************************************************" + Cores.reset);
+
+    try {
+      opcao = readlinesync.questionInt("Entre com a opcao desejada: ");
+    } catch {
+      opcao = -1;
+    }
+
+    switch (opcao) {
+      case 1: // Cadastrar
         try {
-            opcao = readlinesync.questionInt("Entre com a opcao desejada: ");
-        } catch (error) {
-            opcao = -1;
+          const nome = readlinesync.question("Nome da roupa: ");
+          const preco = readlinesync.questionFloat("Preço: ");
+          const tamanho = readlinesync.question("Tamanho (P/M/G): ");
+          const camiseta = new Camiseta(Id, nome, preco, tamanho);
+          controller.cadastrar(camiseta);
+          console.log("\nCadastrado com sucesso! ID:", Id);
+          Id++;
+        } catch (err: any) {
+          console.log("\nErro:", err.message);
         }
+        break;
 
-        switch (opcao) {
-            case 1: cadastrarProduto(); break;
-            case 2: listarProdutos(); break;
-            case 3: buscarPorId(); break;
-            case 4: atualizarProduto(); break;
-            case 5: deletarProduto(); break;
-            case 0:
-                console.log(CoresLocal.verde + "\nEncerrado! Volte sempre!" + CoresLocal.reset);
-                break;
-            default:
-                console.log(CoresLocal.fundo + CoresLocal.verde + "\nOpcao Invalida! Tente novamente." + CoresLocal.reset);
+      case 2: // Listar
+        {
+          const lista = controller.listarTodos();
+          if (lista.length === 0) {
+            console.log("\nNenhuma roupa cadastrada.");
+          } else {
+            lista.forEach(p => p.visualizar());
+          }
         }
+        break;
 
-    } while (opcao !== 0);
+      case 3: // Buscar por ID
+        try {
+          const idBusca = readlinesync.questionInt("ID para buscar: ");
+          
+          const p = controller.procurarPorId(idBusca);
+          
+          if (p) {
+            p.visualizar();
+          } else {
+            console.log("\nProduto nao encontrado.");
+          }
+        } catch (err: any) {
+          console.log("\nErro:", err.message);
+        }
+        break;
+
+      case 4: // Atualizar
+        try {
+          const idAtual = readlinesync.questionInt("ID da camiseta a atualizar: ");
+          // garantimos que existe (buscarPorId lançará exceção se não)
+          const existente = controller.procurarPorId(idAtual);
+          if (!existente) {
+            console.log("\nProduto nao encontrado.");
+            break;
+          }
+
+          const novoNome = readlinesync.question("Novo nome: ");
+          const novoPreco = readlinesync.questionFloat("Novo preco: ");
+          const novoTam = readlinesync.question("Novo tamanho: ");
+          const novaId = readlinesync.question("Nova id: ");
+
+          const atualizado = new Camiseta(idAtual, novoNome, novoPreco, novoTam);
+          controller.atualizar(atualizado);
+          console.log("\nAtualizado com sucesso.");
+        } catch (err: any) {
+          console.log("\nErro:", err.message);
+        }
+        break;
+
+      case 5: // Deletar
+        try {
+          const idDel = readlinesync.questionInt("ID da camiseta a deletar: ");
+          controller.deletar(idDel);
+          console.log("\nDeletado com sucesso.");
+        } catch (err: any) {
+          console.log("\nErro:", err.message);
+        }
+        break;
+
+      case 0:
+        console.log(Cores.verde + "\nEncerrado! Volte sempre!" + Cores.reset);
+        break;
+
+      default:
+        console.log("\nOpcao invalida! Tente novamente.");
+    }
+
+  } while (opcao !== 0);
 }
 
 main();
