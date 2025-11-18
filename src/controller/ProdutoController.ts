@@ -3,33 +3,37 @@ import { ProdutoRepository } from "../repository/ProdutoRepository";
 import { ProdutoNaoEncontradoException } from "../exeption/ProdutoNaoEncontradoException";
 
 export class ProdutoController implements ProdutoRepository {
-    private listaProdutos: Produto[] = [];
+    private lista: Produto[] = [];
 
     listarTodos(): Produto[] {
-        return this.listaProdutos; 
+        return this.lista;
     }
 
-    procurarPorId(id: number): Produto | null {
-        const p = this.listaProdutos.find(item => item.getId() === id) || null;
-        if (!p) throw new ProdutoNaoEncontradoException(id);
-        return p;
+    procurarPorId(id: number): Produto {
+        const produto = this.lista.find(p => p.getId() === id);
+        if (!produto) throw new ProdutoNaoEncontradoException(id);
+        return produto;
     }
 
     cadastrar(produto: Produto): void {
-        const existe = this.listaProdutos.some(p => p.getId() === produto.getId());
-        if (existe) throw new Error(`Já existe produto com ID ${produto.getId()}`);
-        this.listaProdutos.push(produto);
+        const existe = this.lista.some(p => p.getId() === produto.getId());
+        if (existe) {
+            throw new Error(`Já existe produto com ID ${produto.getId()}`);
+        }
+        this.lista.push(produto);
     }
 
     atualizar(produtoAtualizado: Produto): void {
-        const idx = this.listaProdutos.findIndex(p => p.getId() === produtoAtualizado.getId());
-        if (idx === -1) throw new ProdutoNaoEncontradoException(produtoAtualizado.getId());
-        this.listaProdutos[idx] = produtoAtualizado;
+        const index = this.lista.findIndex(p => p.getId() === produtoAtualizado.getId());
+        if (index === -1) throw new ProdutoNaoEncontradoException(produtoAtualizado.getId());
+        this.lista[index] = produtoAtualizado;
     }
 
     deletar(id: number): void {
-        const idx = this.listaProdutos.findIndex(p => p.getId() === id);
-        if (idx === -1) throw new ProdutoNaoEncontradoException(id);
-        this.listaProdutos.splice(idx, 1);
+        const index = this.lista.findIndex(p => p.getId() === id);
+        if (index === -1) throw new ProdutoNaoEncontradoException(id);
+        this.lista.splice(index, 1);
     }
 }
+
+export const produtoController = new ProdutoController();

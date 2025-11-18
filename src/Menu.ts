@@ -1,124 +1,207 @@
-// src/Menu.ts
-import readlinesync from 'readline-sync';
-import { ProdutoController } from "./controller/ProdutoController";
+import readlineSync from "readline-sync";
+import { produtoController } from "./controller/ProdutoController";
 import { Camiseta } from "./model/Camiseta";
 
-const controller = new ProdutoController();
-
+// Paleta de Cores
 const Cores = {
   reset: "\x1b[0m",
-  fundo: "\x1b[40m",
+  bold: "\x1b[1m",
+
+  preto: "\x1b[30m",
+  vermelho: "\x1b[31m",
   verde: "\x1b[32m",
-  amarelo: "\x1b[33m"
+  amarelo: "\x1b[33m",
+  azul: "\x1b[34m",
+  roxo: "\x1b[35m",
+  ciano: "\x1b[36m",
+  branco: "\x1b[37m",
+
+  fundoPreto: "\x1b[40m",
+  fundoVermelho: "\x1b[41m",
+  fundoVerde: "\x1b[42m",
+  fundoAmarelo: "\x1b[43m",
+  fundoAzul: "\x1b[44m",
+  fundoRoxo: "\x1b[45m",
+  fundoCiano: "\x1b[46m",
+  fundoBranco: "\x1b[47m",
 };
 
-export function main() {
-  let opcao: number = -1;
-  let Id = 1;
-
-  do {
-    console.log(Cores.fundo + Cores.amarelo);
-    console.log("*****************************************************");
-    console.log("                Loja de Roupas (GENERATION)          ");
-    console.log("*****************************************************");
-    console.log("\n1 - Cadastrar roupa");
-    console.log("2 - Listar Todas as roupa");
-    console.log("3 - Buscar roupa por ID");
-    console.log("4 - Atualizar roupa");
-    console.log("5 - Deletar roupa");
-    console.log(Cores.verde + "0 - Sair");
-    console.log(Cores.amarelo + "*****************************************************" + Cores.reset);
-
-    try {
-      opcao = readlinesync.questionInt("Entre com a opcao desejada: ");
-    } catch {
-      opcao = -1;
-    }
-
-    switch (opcao) {
-      case 1: // Cadastrar
-        try {
-          const nome = readlinesync.question("Nome da roupa: ");
-          const preco = readlinesync.questionFloat("Preço: ");
-          const tamanho = readlinesync.question("Tamanho (P/M/G): ");
-          const camiseta = new Camiseta(Id, nome, preco, tamanho);
-          controller.cadastrar(camiseta);
-          console.log("\nCadastrado com sucesso! ID:", Id);
-          Id++;
-        } catch (err: any) {
-          console.log("\nErro:", err.message);
-        }
-        break;
-
-      case 2: // Listar
-        {
-          const lista = controller.listarTodos();
-          if (lista.length === 0) {
-            console.log("\nNenhuma roupa cadastrada.");
-          } else {
-            lista.forEach(p => p.visualizar());
-          }
-        }
-        break;
-
-      case 3: // Buscar por ID
-        try {
-          const idBusca = readlinesync.questionInt("ID para buscar: ");
-          
-          const p = controller.procurarPorId(idBusca);
-          
-          if (p) {
-            p.visualizar();
-          } else {
-            console.log("\nProduto nao encontrado.");
-          }
-        } catch (err: any) {
-          console.log("\nErro:", err.message);
-        }
-        break;
-
-      case 4: // Atualizar
-        try {
-          const idAtual = readlinesync.questionInt("ID da camiseta a atualizar: ");
-          // garantimos que existe (buscarPorId lançará exceção se não)
-          const existente = controller.procurarPorId(idAtual);
-          if (!existente) {
-            console.log("\nProduto nao encontrado.");
-            break;
-          }
-
-          const novoNome = readlinesync.question("Novo nome: ");
-          const novoPreco = readlinesync.questionFloat("Novo preco: ");
-          const novoTam = readlinesync.question("Novo tamanho: ");
-          const novaId = readlinesync.question("Nova id: ");
-
-          const atualizado = new Camiseta(idAtual, novoNome, novoPreco, novoTam);
-          controller.atualizar(atualizado);
-          console.log("\nAtualizado com sucesso.");
-        } catch (err: any) {
-          console.log("\nErro:", err.message);
-        }
-        break;
-
-      case 5: // Deletar
-        try {
-          const idDel = readlinesync.questionInt("ID da camiseta a deletar: ");
-          controller.deletar(idDel);
-          console.log("\nDeletado com sucesso.");
-        } catch (err: any) {
-          console.log("\nErro:", err.message);
-        }
-        break;
-
-      case 0:
-        console.log(Cores.verde + "\nEncerrado! Volte sempre!" + Cores.reset);
-        break;
-
-      default:
-        console.log("\nOpcao invalida! Tente novamente.");
-    }
-
-  } while (opcao !== 0);
+// Função para centralizar
+function center(text: string, width = 60) {
+  const space = Math.max(0, Math.floor((width - text.length) / 2));
+  return " ".repeat(space) + text;
 }
 
-main();
+function logo() {
+  console.clear();
+
+  console.log(
+    Cores.fundoPreto +
+      Cores.verde +
+      Cores.bold +
+      "\n" +
+      center("====================================================") +
+      "\n" +
+      center("LOJA ONLINE DE ROUPAS (GENERATION)") +
+      "\n" +
+      center("====================================================") +
+      "\n" +
+      Cores.reset
+  );
+}
+
+function menu() {
+  while (true) {
+    logo();
+
+    console.log(
+      Cores.amarelo +
+        Cores.bold +
+        "\n" +
+        center("1 • Cadastrar Produto") +
+        "\n" +
+        center("2 • Listar Todos os Produtos") +
+        "\n" +
+        center("3 • Buscar Produto por ID") +
+        "\n" +
+        center("4 • Atualizar Produto") +
+        "\n" +
+        center("5 • Deletar Produto") +
+        "\n" +
+        center("0 • Sair") +
+        "\n" +
+        Cores.reset
+    );
+    console.log(
+    Cores.fundoPreto +
+      Cores.ciano +
+      Cores.bold +
+      "\n" +
+      center("====================================================") +
+      "\n" +
+      Cores.reset
+    );
+
+      const op = readlineSync.question(
+      Cores.ciano + center("Escolha uma opcao: ") + Cores.reset
+       +
+      
+      "\n"
+    );
+
+    
+
+
+    switch (op) {
+      case "1":
+        cadastrarProduto();
+        break;
+
+      case "2":
+        listarProdutos();
+        break;
+
+      case "3":
+        buscarPorId();
+        break;
+
+      case "4":
+        atualizarProduto();
+        break;
+
+      case "5":
+        deletarProduto();
+        break;
+
+      case "0":
+        console.log(center(Cores.verde + "       Sistema encerrado.\n" + Cores.reset));
+        process.exit(0);
+    }
+  }
+}
+
+function cadastrarProduto() {
+  console.clear();
+  console.log(center(Cores.azul + Cores.bold + "            === CADASTRAR PRODUTO ===" + Cores.reset));
+
+  const id = readlineSync.questionInt(center("ID: "));
+  const nome = readlineSync.question(center("Nome: "));
+  const preco = Number(readlineSync.question(center("Preco: ")));
+  const tamanho = readlineSync.question(center("Tamanho: "));
+
+  const produto = new Camiseta(id, nome, preco, tamanho);
+  produtoController.cadastrar(produto);
+
+  console.log(center(Cores.verde + "          Produto cadastrado!" + Cores.reset));
+  readlineSync.question(center("ENTER para voltar..."));
+}
+
+function listarProdutos() {
+  console.clear();
+  console.log(center(Cores.azul + Cores.bold + "=== LISTA DE PRODUTOS ===" + Cores.reset));
+
+  const lista = produtoController.listarTodos();
+
+  if (lista.length === 0) {
+    console.log(center(Cores.amarelo + "Nenhum produto encontrado." + Cores.reset));
+  } else {
+    lista.forEach((p) => {
+      console.log(
+        center(
+          Cores.ciano +
+            `ID: ${p.getId()} | Nome: ${p.getNome()} | Preco: R$ ${p.getPreco()}` +
+            Cores.reset
+        )
+      );
+    });
+  }
+
+  readlineSync.question(center("ENTER para voltar..."));
+}
+
+function buscarPorId() {
+  console.clear();
+  console.log(center(Cores.azul + Cores.bold + "=== BUSCAR PRODUTO ===" + Cores.reset));
+
+  const id = readlineSync.questionInt(center("ID: "));
+  const p = produtoController.procurarPorId(id);
+
+  console.log(
+    center(
+      Cores.verde +
+        `Encontrado: ${p.getNome()} | R$ ${p.getPreco()}` +
+        Cores.reset
+    )
+  );
+
+  readlineSync.question(center("ENTER para voltar..."));
+}
+
+function atualizarProduto() {
+  console.clear();
+  console.log(center(Cores.azul + Cores.bold + "=== ATUALIZAR PRODUTO ===" + Cores.reset));
+
+  const id = readlineSync.questionInt(center("ID: "));
+  const nome = readlineSync.question(center("Novo nome: "));
+  const preco = Number(readlineSync.question(center("Novo preco: ")));
+  const tamanho = readlineSync.question(center("Novo tamanho: "));
+
+  const produto = new Camiseta(id, nome, preco, tamanho);
+  produtoController.atualizar(produto);
+
+  console.log(center(Cores.verde + "Atualizado!" + Cores.reset));
+  readlineSync.question(center("ENTER para voltar..."));
+}
+
+function deletarProduto() {
+  console.clear();
+  console.log(center(Cores.azul + Cores.bold + "=== DELETAR PRODUTO ===" + Cores.reset));
+
+  const id = readlineSync.questionInt(center("ID: "));
+  produtoController.deletar(id);
+
+  console.log(center(Cores.verde + "Removido!" + Cores.reset));
+  readlineSync.question(center("ENTER para voltar..."));
+}
+
+menu();
