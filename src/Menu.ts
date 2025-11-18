@@ -1,5 +1,6 @@
 import readlineSync from "readline-sync";
 import { produtoController } from "./controller/ProdutoController";
+import { Produto } from "./model/Produto";  
 import { Camiseta } from "./model/Camiseta";
 
 // Paleta de Cores
