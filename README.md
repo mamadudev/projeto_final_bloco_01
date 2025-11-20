@@ -73,4 +73,4 @@ A organização em pastas reflete a arquitetura MVC, separando a lógica de neg�
     ├── repository/
     └── Menu.ts 
 👤 Autor
-Desenvolvido com 💙 por Mamadou Diagne
+Desenvolvido por Mamadou Diagne
