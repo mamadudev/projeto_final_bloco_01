@@ -27,7 +27,6 @@ const Cores = {
   fundoBranco: "\x1b[47m",
 };
 
-// Função para centralizar
 function center(text: string, width = 60) {
   const space = Math.max(0, Math.floor((width - text.length) / 2));
   return " ".repeat(space) + text;
@@ -74,48 +73,67 @@ function menu() {
         Cores.reset
     );
     console.log(
-    Cores.fundoPreto +
-      Cores.ciano +
-      Cores.bold +
-      "\n" +
-      center("====================================================") +
-      "\n" +
-      Cores.reset
+      Cores.fundoPreto +
+        Cores.ciano +
+        Cores.bold +
+        "\n" +
+        center("====================================================") +
+        "\n" +
+        Cores.reset
     );
 
-      const op = readlineSync.question(
-      Cores.ciano + center("Escolha uma opcao: ") + Cores.reset
-       +
-      
-      "\n"
+    const op = readlineSync.question(
+      Cores.ciano + center("Escolha uma opcao: ") + Cores.reset + "\n"
     );
-
-    
-
 
     switch (op) {
       case "1":
-        cadastrarProduto();
+        try {
+          cadastrarProduto();
+        } catch (error: any) {
+          console.log(Cores.vermelho + center(error.message) + Cores.reset);
+          readlineSync.question(center("ENTER para voltar..."));
+        }
         break;
 
       case "2":
-        listarProdutos();
+        try {
+          listarProdutos();
+        } catch (error: any) {
+          console.log(Cores.vermelho + center(error.message) + Cores.reset);
+          readlineSync.question(center("ENTER para voltar..."));
+        }
         break;
 
       case "3":
-        buscarPorId();
+        try {
+          buscarPorId();
+        } catch (error: any) {
+          console.log(Cores.vermelho + center(error.message) + Cores.reset);
+          readlineSync.question(center("ENTER para voltar..."));
+        }
         break;
 
       case "4":
-        atualizarProduto();
+        try {
+          atualizarProduto();
+        } catch (error: any) {
+          console.log(Cores.vermelho + center(error.message) + Cores.reset);
+          readlineSync.question(center("ENTER para voltar..."));
+        }
         break;
 
       case "5":
-        deletarProduto();
+        try {
+          deletarProduto();
+        } catch (error: any) {
+          console.log(Cores.vermelho + center(error.message) + Cores.reset);
+          readlineSync.question(center("ENTER para voltar..."));
+        }
         break;
 
       case "0":
-        console.log(center(Cores.verde + "       Sistema encerrado.\n" + Cores.reset));
+        console.log(center(Cores.verde + "Sistema encerrado.\n" + Cores.reset));
         process.exit(0);
     }
   }
@@ -123,7 +141,7 @@ function menu() {
 
 function cadastrarProduto() {
   console.clear();
-  console.log(center(Cores.azul + Cores.bold + "            === CADASTRAR PRODUTO ===" + Cores.reset));
+  console.log(center(Cores.azul + Cores.bold + "=== CADASTRAR PRODUTO ===" + Cores.reset));
 
   const id = readlineSync.questionInt(center("ID: "));
   const nome = readlineSync.question(center("Nome: "));
@@ -131,9 +149,10 @@ function cadastrarProduto() {
   const tamanho = readlineSync.question(center("Tamanho: "));
 
   const produto = new Camiseta(id, nome, preco, tamanho);
+
   produtoController.cadastrar(produto);
 
-  console.log(center(Cores.verde + "          Produto cadastrado!" + Cores.reset));
+  console.log(center(Cores.verde + "Produto cadastrado!" + Cores.reset));
   readlineSync.question(center("ENTER para voltar..."));
 }
 
@@ -169,9 +188,7 @@ function buscarPorId() {
 
   console.log(
     center(
-      Cores.verde +
-        `Encontrado: ${p.getNome()} | R$ ${p.getPreco()}` +
-        Cores.reset
+      Cores.verde + `Encontrado: ${p.getNome()} | R$ ${p.getPreco()}` + Cores.reset
     )
   );
 
@@ -188,6 +205,7 @@ function atualizarProduto() {
   const tamanho = readlineSync.question(center("Novo tamanho: "));
 
   const produto = new Camiseta(id, nome, preco, tamanho);
+
   produtoController.atualizar(produto);
 
   console.log(center(Cores.verde + "Atualizado!" + Cores.reset));
